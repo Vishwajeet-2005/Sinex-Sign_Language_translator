@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Translator</title>
+    <style>
+        body {
+            background-color: #1f1f1f;
+            font-family: 'Arial', sans-serif;
+            color: #ecf0f1;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+        }
+
+        /* Header and Navigation Bar */
+        header {
+            width: 100%;
+            background-color: #212427;
+            padding: 15px 0;
+            position:fixed;
+            top: 0;
+            z-index: 100;
+            animation: slideIn 1s ease-out;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: right;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            margin: 0 20px;
+            transition: transform 0.3s ease;
+        }
+
+        nav ul li a {
+            color: #ecf0f1;
+            font-size: 18px;
+            text-decoration: dashed;
+            padding: 10px;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #3498db;
+        }
+
+        nav ul li:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+
+        /* Hero Section with Background Image */
+        .hero {
+            width: 150%;
+            height: 80vh;
+            background: url('back.jpg') no-repeat right center/cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #ecf0f1;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 40px;
+            color: #ecf0f1;
+            font-family: brief san;
+            animation: fadeIn 2s ease-out;
+        }
+
+        .logo{
+            width: 100px;
+            justify-items: left;
+            margin: 0px 80px 0px 10px;
+            border-radius: 40% 0%;
+        }
+        #textInput {
+            padding: 15px;
+            width: 80%;
+            margin-top: 20px;
+            border-radius: 5px;
+            border: none;
+            font-size: 1.2em;
+        }
+
+        .o1{
+            border-radius: 10px;
+            background-color: #040404;
+            padding: 15px;
+        }
+        .nav1{
+            display: flex;
+            flex-direction: row;
+        }
+
+        .output {
+            margin-top: 20px;
+            font-size: 1.8em;
+            color: #2980b9;
+            font-weight: bold;
+        }
+
+        .output p {
+            animation: fadeIn 2s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section with Navigation -->
+    <header>
+        <nav class="nav1">
+            <img src="logo.png" alt="#" class="logo">
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="scanner.html">Scanner</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section with Background Image -->
+    <section class="hero">
+        <div class="o1">
+            <h1>Sign Language Translator</h1>
+            <input type="text" id="textInput" placeholder="Enter text..." oninput="translateToSign()">
+        </div>
+    </section>
+
+    <!-- Translated Output -->
+    <div class="output" id="outputText"></div>
+
+    <script>
+        const signLanguageMap = {
+            A: "🤟", B: "✋", C: "🤲", D: "👌", E: "✊", F: "🤞", G: "🖖", H: "👐",
+            I: "☝️", J: "🤘", K: "👍", L: "👎", M: "✌️", N: "🤙", O: "👊", P: "🤛",
+            Q: "🤜", R: "👋", S: "🤏", T: "🖐", U: "🖖", V: "✌️", W: "🖖", X: "☝️",
+            Y: "🤟", Z: "✋", " ": " "
+        };
+
+        function translateToSign() {
+            const inputText = document.getElementById("textInput").value.toUpperCase();
+            const translatedText = inputText.split('').map(char => signLanguageMap[char] || char).join(' ');
+            document.getElementById("outputText").innerText = translatedText;
+        }
+    </script>
+
+</body>
+</html>

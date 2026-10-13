@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice to Sign Language Translator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #121212;
+            color: white;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .btn {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+        }
+        .sign-output {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            font-size: 50px;
+            gap: 10px;
+        }
+        .letter {
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Voice to Sign Language Translator</h1>
+        <button class="btn" onclick="startListening()">Start Speaking</button>
+        <p id="recognized-text">Say something...</p>
+        <div class="sign-output" id="sign-output"></div>
+    </div>
+    
+    <script>
+        const signLanguageEmoji = {
+            a: "🤟", b: "🫵", c: "🤲", d: "☝️", e: "✋",
+            f: "👌", g: "🖖", h: "🤞", i: "☝", j: "✌️",
+            k: "🤞", l: "👍", m: "🖐️", n: "🤘", o: "👌",
+            p: "👆", q: "👇", r: "🤙", s: "✊", t: "👊",
+            u: "🤞", v: "✌️", w: "👐", x: "🤘", y: "🤙",
+            z: "✋"
+        };
+
+        function startListening() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                const spokenText = event.results[0][0].transcript;
+                document.getElementById("recognized-text").innerText = spokenText;
+                displaySignLanguage(spokenText);
+            };
+        }
+
+        function displaySignLanguage(text) {
+            const signOutput = document.getElementById("sign-output");
+            signOutput.innerHTML = ""; 
+            const words = text.toLowerCase().split(" ");
+            let delay = 0;
+
+            words.forEach(word => {
+                [...word].forEach(letter => {
+                    if (signLanguageEmoji[letter]) {
+                        const span = document.createElement("span");
+                        span.innerText = signLanguageEmoji[letter];
+                        span.className = "letter";
+                        span.style.animationDelay = `${delay}s`;
+                        delay += 0.5; // Increment delay for each letter
+                        signOutput.appendChild(span);
+                    }
+                });
+
+                // Add space between words
+                if (word) {
+                    delay += 0.5; // Additional delay for space
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+

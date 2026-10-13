@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Language Translator</title>
+    <style>
+        /* General styling */
+        body {
+            background-color: #2c3e50;
+            color: white;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            animation: fadeIn 2s ease-out;
+        }
+
+        video {
+            width: 80%;
+            border: 5px solid white;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        #output {
+            margin-top: 20px;
+            font-size: 24px;
+            color: #1abc9c;
+        }
+
+        /* Navbar styles */
+        nav {
+            background-color: #2e5276;
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 15px 0;
+        }
+
+        nav ul {
+            display: flex;
+            justify-content: right;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        nav ul li {
+            margin: 0 20px;
+        }
+
+        nav ul li a {
+            color: #ecf0f1;
+            font-size: 18px;
+            padding: 10px;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #3498db;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        .logo{
+            width: 100px;
+            justify-items: left;
+            margin: 0px 10px;
+            border-radius: 40% 0%;
+        }
+        .nav1{
+            display: flex;
+            flex-direction: row;
+        }
+
+        /* Footer styles */
+        footer {
+            background-color: #2c3e50;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            width: 100%;
+        }
+
+        footer p {
+            margin: 0;
+        }
+
+        footer a {
+            color: #ecf0f1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: #3498db;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="nav1">
+        <img src="logo.png" alt="#" class="logo"> 
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="trans.html">Translator</a></li>
+            
+        </ul>
+    </nav>
+
+    <!-- Sign Language Translator Section -->
+    <section id="translator">
+        <h1>Sign Language Translator</h1>
+        <video id="webcam" autoplay></video>
+        <div id="output">Please show your hand for detection</div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Sign Language Translator. All rights reserved.</p>
+        <p><a href="mailto:support@signtranslator.com">Contact Us</a></p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/handpose"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl"></script>
+    <script>
+        const video = document.getElementById('webcam');
+        const output = document.getElementById('output');
+        let model;
+
+        // Load the camera
+        async function setupCamera() {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: true
+            });
+            video.srcObject = stream;
+        }
+
+        // Load Handpose model
+        async function loadModel() {
+            model = await handpose.load();
+            console.log("Model loaded");
+        }
+
+        // Detect hand and identify gesture
+        async function detect() {
+            if (model) {
+                const predictions = await model.estimateHands(video);
+                if (predictions.length > 0) {
+                    // Check the hand gesture for "Hello", "Thank You", or "Please"
+                    const gesture = predictGesture(predictions[0]);
+                    output.innerText = gesture || 'No valid gesture detected';
+                } else {
+                    output.innerText = 'No hand detected.';
+                }
+            }
+        }
+
+        // Gesture prediction for "Hello", "Thank You", "Please"
+        function predictGesture(hand) {
+            const keypoints = hand.landmarks;
+
+            // Gesture for "Hello" (open hand)
+            const openHand = keypoints[4][1] < keypoints[3][1] &&
+                             keypoints[8][1] < keypoints[7][1] &&
+                             keypoints[12][1] < keypoints[11][1] &&
+                             keypoints[16][1] < keypoints[15][1] &&
+                             keypoints[20][1] < keypoints[19][1];
+
+            // Gesture for "Thank You" (hand moved slightly forward from chest)
+            const thankYou = keypoints[0][1] > 200 && keypoints[0][0] > 150 && keypoints[0][0] < 400;
+
+            // Gesture for "Please" (palm facing up with fingers together)
+            const please = keypoints[4][1] < keypoints[3][1] &&
+                           keypoints[8][1] < keypoints[7][1] &&
+                           keypoints[12][1] < keypoints[11][1] &&
+                           keypoints[16][1] < keypoints[15][1] &&
+                           keypoints[20][1] < keypoints[19][1] &&
+                           keypoints[4][2] < 100 && keypoints[8][2] < 100;
+
+            if (openHand) {
+                return "Hello";
+            } else if (thankYou) {
+                return "Thank You";
+            } else if (please) {
+                return "Please";
+            }
+            return null;
+        }
+
+        // Setup camera and model
+        setupCamera();
+        loadModel();
+
+        // Periodically check for hand gestures
+        setInterval(detect, 100);
+    </script>
+</body>
+</html>
